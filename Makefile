@@ -1,4 +1,4 @@
-OBJECTS = boot.o kernel.o
+OBJECTS = src/boot.o src/kernel.o src/io.o src/Terminal.o src/vga/Screen.o
 CXX = i686-elf-g++
 CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
 
