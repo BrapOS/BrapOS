@@ -18,8 +18,14 @@ $(KERNEL): $(OBJECTS)
 %.o: %.s
 	$(AS) $< -o $@
 
+.PHONY: doc run clean
+
+doc:
+	doxygen Doxyfile
+
 run: $(KERNEL)
 	qemu-system-i386 -kernel $(KERNEL)
 
 clean:
-	rm -rf *.o $(KERNEL)
+	rm -rf $(OBJECTS) $(KERNEL)
+	rm -rf doc
