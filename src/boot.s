@@ -32,6 +32,25 @@ stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
 
+.section .data
+.align 16
+gdt_start:
+    # Entry 1
+    .int 0x00000000
+    .int 0x00000000
+
+    # Entry 2
+    .int 0x0000FFFF
+    .int 0x00CF9A00
+
+    # Entry 3
+    .int 0x0000FFFF
+    .int 0x00CF9200
+
+gdt_info:
+    .short 0x17    # gdt - gtd_start - 1
+    .int gdt_start
+
 # The linker script specifies _start as the entry point to the kernel and the
 # bootloader will jump to this position once the kernel has been loaded. It
 # doesn't make sense to return from this function as the bootloader is gone.
@@ -63,6 +82,16 @@ _start:
     # yet. The GDT should be loaded here. Paging should be enabled here.
     # C++ features such as global constructors and exceptions will require
     # runtime support to work as well.
+    ## Load a basic GDT
+    lgdt (gdt_info)
+    ljmp $0x08, $reload
+reload:
+    mov $0x10, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %ax, %ss
 
     # Enter the high-level kernel. The ABI requires the stack is 16-byte
     # aligned at the time of the call instruction (which afterwards pushes
