@@ -1,4 +1,4 @@
-OBJECTS = src/boot.o src/kernel.o src/io.o src/Terminal.o src/vga/Screen.o
+OBJECTS = src/boot.o src/kernel.o src/util/util.o src/io.o src/Terminal.o src/vga/Screen.o src/SerialPort.o
 DEPS = $(OBJECTS:.o=.d)
 
 AS = i686-elf-as
@@ -34,7 +34,7 @@ doc:
 	doxygen Doxyfile
 
 run: $(KERNEL)
-	qemu-system-i386 -kernel $(KERNEL)
+	qemu-system-i386 -kernel $(KERNEL) -serial stdio
 
 clean:
 	rm -rf $(OBJECTS) $(DEPS) $(KERNEL) doc
