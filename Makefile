@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -Wextra -ffreestanding -fno-exceptions -fno-rtti -g
 DEPFLAGS = -MT $@ -MMD -MP -MF $*.Td
 LDFLAGS  = -ffreestanding -nostdlib -lgcc
 
-OBJECTS     = src/boot.o src/kernel.o src/util/util.o src/io.o src/Terminal.o src/vga/Screen.o src/SerialPort.o src/interrupt.o src/Keyboard.o
+OBJECTS     = src/boot.o src/kernel.o src/util/util.o src/io.o src/Terminal.o src/vga/Screen.o src/SerialPort.o src/interrupt.o src/Keyboard.o src/KernelLogger.o
 CRTI_OBJECT = src/crti.o
 CRTBEGIN_OBJECT := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJECT   := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtend.o)
