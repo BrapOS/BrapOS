@@ -2,3 +2,6 @@ doc/
 **/*.o
 **/*.d
 brapos.bin
+brapos.iso
+isodir/
+bochslog.txt

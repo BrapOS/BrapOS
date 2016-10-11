@@ -1,7 +1,7 @@
 CXX = i686-elf-g++
 AS  = i686-elf-as
 
-CXXFLAGS = -g -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
+CXXFLAGS = -Wall -Wextra -ffreestanding -fno-exceptions -fno-rtti -g
 DEPFLAGS = -MT $@ -MMD -MP -MF $*.Td
 LDFLAGS  = -ffreestanding -nostdlib -lgcc
 
@@ -16,11 +16,20 @@ DEPS = $(OBJECTS:.o=.d)
 POSTCOMPILE = mv -f $*.Td $*.d
 
 KERNEL = brapos.bin
+KERNEL_ISO = brapos.iso
+ISODIR = isodir
+GRUB_CONFIG = grub.cfg
 
 all: $(KERNEL)
 
 $(KERNEL): $(ALL_OBJECTS)
 	$(CXX) $(LDFLAGS) $(ALL_OBJECTS) -T linker.ld -o $(KERNEL)
+
+$(KERNEL_ISO): $(KERNEL)
+	mkdir -p $(ISODIR)/boot/grub
+	cp $(KERNEL) $(ISODIR)/boot/$(KERNEL)
+	cp $(GRUB_CONFIG) $(ISODIR)/boot/grub/$(GRUB_CONFIG)
+	grub-mkrescue -o $(KERNEL_ISO) $(ISODIR)
 
 %.o: %.s
 	$(AS) $< -o $@
@@ -33,15 +42,23 @@ $(KERNEL): $(ALL_OBJECTS)
 %.d: ;
 .PRECIOUS: %.d
 
-.PHONY: doc run clean
+.PHONY: doc iso gdb qemu bochs gdb clean
 
 doc:
 	doxygen Doxyfile
 
-run: $(KERNEL)
+iso: $(KERNEL_ISO)
+
+qemu: $(KERNEL)
 	qemu-system-i386 -kernel $(KERNEL) -serial stdio -s
 
+bochs: $(KERNEL_ISO)
+	bochs -f bochsrc.txt -q
+
+gdb: $(KERNEL)
+	gdb -x init.gdb
+
 clean:
-	rm -rf $(OBJECTS) $(CRTI_OBJECT) $(CRTN_OBJECT) $(DEPS) $(KERNEL) doc
+	rm -rf $(OBJECTS) $(CRTI_OBJECT) $(CRTN_OBJECT) $(DEPS) $(KERNEL) $(KERNEL_ISO) $(ISODIR) doc
 
 -include $(DEPS)
