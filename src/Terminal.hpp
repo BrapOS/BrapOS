@@ -20,6 +20,7 @@ public:
     Terminal();
     /// Write a string of characters to the terminal
     void write(const char* data);
+    void write(const unsigned char* data);
 
 private:
     /// Add an empty line (and scroll the screen one row if there is no space

@@ -117,6 +117,13 @@ reload:
 1:  hlt
     jmp 1b
 
+.global handleInterruptKeyboard
+handleInterruptKeyboard:
+    pusha
+    call cHandleInterruptKeyboard
+    popa
+    iret
+
 # Set the size of the _start symbol to the current location '.' minus its start.
 # This is useful when debugging or when you implement call tracing.
 .size _start, . - _start

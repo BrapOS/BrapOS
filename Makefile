@@ -1,11 +1,11 @@
 CXX = i686-elf-g++
 AS  = i686-elf-as
 
-CXXFLAGS = -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+CXXFLAGS = -g -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
 DEPFLAGS = -MT $@ -MMD -MP -MF $*.Td
-LDFLAGS  = -ffreestanding -O2 -nostdlib -lgcc
+LDFLAGS  = -ffreestanding -nostdlib -lgcc
 
-OBJECTS     = src/boot.o src/kernel.o src/util/util.o src/io.o src/Terminal.o src/vga/Screen.o src/SerialPort.o
+OBJECTS     = src/boot.o src/kernel.o src/util/util.o src/io.o src/Terminal.o src/vga/Screen.o src/SerialPort.o src/interrupt.o src/Keyboard.o
 CRTI_OBJECT = src/crti.o
 CRTBEGIN_OBJECT := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJECT   := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtend.o)
@@ -39,7 +39,7 @@ doc:
 	doxygen Doxyfile
 
 run: $(KERNEL)
-	qemu-system-i386 -kernel $(KERNEL) -serial stdio
+	qemu-system-i386 -kernel $(KERNEL) -serial stdio -s
 
 clean:
 	rm -rf $(OBJECTS) $(CRTI_OBJECT) $(CRTN_OBJECT) $(DEPS) $(KERNEL) doc

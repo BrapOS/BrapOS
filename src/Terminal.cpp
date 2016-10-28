@@ -41,6 +41,12 @@ void Terminal::write(const char* data)
     }
 }
 
+void Terminal::write(const unsigned char* data) {
+    for (size_t i = 0; data[i] != '\0'; ++i) {
+        putChar(data[i]);
+    }
+}
+
 /**
  * \brief Add an empty line (and scroll the screen one row if there is no space
  * left)
