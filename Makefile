@@ -6,10 +6,10 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $*.Td
 LDFLAGS  = -ffreestanding -O2 -nostdlib -lgcc
 
 OBJECTS     = src/boot.o src/kernel.o src/util/util.o src/io.o src/Terminal.o src/vga/Screen.o src/SerialPort.o
-CRTI_OBJECT = crti.o
+CRTI_OBJECT = src/crti.o
 CRTBEGIN_OBJECT := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJECT   := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtend.o)
-CRTN_OBJECT = crtn.o
+CRTN_OBJECT = src/crtn.o
 ALL_OBJECTS := $(CRTI_OBJECT) $(CRTBEGIN_OBJECT) $(OBJECTS) $(CRTEND_OBJECT) $(CRTN_OBJECT)
 DEPS = $(OBJECTS:.o=.d)
 
@@ -42,6 +42,6 @@ run: $(KERNEL)
 	qemu-system-i386 -kernel $(KERNEL) -serial stdio
 
 clean:
-	rm -rf $(OBJECTS) $(DEPS) $(KERNEL) doc
+	rm -rf $(OBJECTS) $(CRTI_OBJECT) $(CRTN_OBJECT) $(DEPS) $(KERNEL) doc
 
 -include $(DEPS)
