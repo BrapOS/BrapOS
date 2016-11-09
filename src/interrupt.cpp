@@ -4,14 +4,17 @@
 #include "interrupt.hpp"
 #include "Keyboard.hpp"
 
+/// The assembly function called by a keyboard interruption
 extern "C" void handleInterruptKeyboard();
 
 /// The interrupt descriptor table (initialized with zeros)
 uint64_t idt[256] = {};
 
 /**
- * \brief Load interrupt descriptor table entry
+ * \brief Load interrupt descriptor table
  *
+ * \param base A pointer to the start of the interrupt descriptor table
+ * \param limit The size of the interrupt descriptor table in bytes
  */
 void lidt(void *base, unsigned int limit)
 {
@@ -22,20 +25,27 @@ void lidt(void *base, unsigned int limit)
     asm ("lidt (%0)": :"r" (((char*) i) + 2));
 }
 
+/**
+ * \brief Initialize the interrupt descriptor talbe
+ * 
+ * This function creates the interrupt descriptor table entries for the
+ * supported interruption (currently only the keyboard interruptions are
+ * supported). Finally, it loads the interrupt descriptor table.
+ */
 void initializeIdt()
 {
-    // Keyboard interruption
+    // Keyboard IDT entry
     uint64_t addressKeyboard = (uint32_t) &handleInterruptKeyboard;
     idt[33] = 0x00008E0000080000;
     idt[33] |= addressKeyboard & 0xFFFF;
     idt[33] |= (addressKeyboard & 0xFFFF0000) << 32;
 
+    // Load the IDT
     lidt(idt, 256*8);
 }
 
 /**
  * \brief Initialize the PIC
- *
  */
 void configPIC()
 {
@@ -68,6 +78,7 @@ void configPIC()
  */
 extern "C" void cHandleInterruptKeyboard()
 {
+    // Static bool to know if modifier keys are pressed or released
     static bool leftShiftPressed  = false;
     static bool rightShiftPressed = false;
     static bool controlPressed    = false;
@@ -76,8 +87,8 @@ extern "C" void cHandleInterruptKeyboard()
     // Read from the keyboard's data buffer
     unsigned char scancode = inb(0x60);
 
-    // Key released
     bool isPressed = !(scancode & 0x80);
+
     if (!isPressed) {
         scancode -= 0x80;
         switch (scancode) {
@@ -95,7 +106,7 @@ extern "C" void cHandleInterruptKeyboard()
                 break;
         }
     }
-    else { // Key pressed
+    else {
         switch (scancode) {
             case 0x2A:
                 leftShiftPressed = true;
@@ -112,6 +123,7 @@ extern "C" void cHandleInterruptKeyboard()
         }
     }
 
+    // Create the keyboard entry and put it in the keyboard
     Keyboard::getInstance().putEntry(KeyboardEntry(
         scancode,
         isPressed,
